@@ -71,7 +71,7 @@ function drawArc( tu, ox, oy, radius, startAngle, endAngle ) {
             case 2: timeUnitChar="S";  break;
         }
         ctx.fillStyle = colorArr[0];  
-        ctx.fillText( `${timeUnitChar}`, ox-16/2, oy );
+        ctx.fillText( timeUnitChar, ox-16/2, oy );
         
         ctx.lineWidth = 50;  // Az időkerék karimájának szélessége, azaz a vonalvastagsága.
         ctx.beginPath();

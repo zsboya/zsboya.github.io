@@ -54,21 +54,39 @@ const color2 = `rgba( 255, 0, 0, 0.5 )`;
 
 let colorArr = [color1, color2];  // Az eltelt (0.:c1) és a hátralévő (1.:c2) időegység színe. 
 
-function drawArc( ox, oy, radius, startAngle, endAngle ) {
+function drawArc( tu, ox, oy, radius, startAngle, endAngle ) {
              
-    ctx.lineWidth = 50;  
-	// Vonalvastagság, vagyis az időkerék karimájának a szélessége.
-
     if (startAngle == endAngle) { startAngle -= 0.000001; }
     // Kis trükk, hogy 0-s startszög esetén a teljes körív kirajzolódjon hátralévőként (color2)!
     
-    for ( let i=0; i<2; i++ ) {
+    ctx.font = "20px Arial";
+    ctx.textBaseline = "middle";
 
+	for ( let i=0; i<2; i++ ) {
+       
+        let timeUnitChar;  // tu: TimeUnit (0:h, 1:m, 2:s)
+        switch(tu) {      
+            case 0: timeUnitChar="H";  break;
+            case 1: timeUnitChar="M";  break;
+            case 2: timeUnitChar="S";  break;
+        }
+        ctx.fillStyle = colorArr[0];  
+        ctx.fillText( `${timeUnitChar}`, ox-16/2, oy );
+        
+        ctx.lineWidth = 50;  // Az időkerék karimájának szélessége, azaz a vonalvastagsága.
         ctx.beginPath();
         ctx.arc( ox, oy, radius, startAngle, endAngle, i%2 );
-             
         ctx.strokeStyle = colorArr[i];  // false (0): colorArr[0] , true (1): colorArr[1]
         ctx.stroke();
+
+        ctx.lineWidth = 2;  // Az időkerekek szélén lévő 12db (20 fokonkénti) jelölés vonalvastagsága.
+        for ( let tum=0; tum<12; tum++ ) {
+                                            // tum: TimeUnit Mark
+            ctx.beginPath();
+            ctx.arc( ox, oy, radius+50/2 +2, tum*fullCircle/12 -0.01, tum*fullCircle/12 +0.01 );  
+            ctx.strokeStyle = "gray";  // Az időkerekek szélén lévő 12db (20 fokonkénti) jelölés színe.
+            ctx.stroke();
+        }
     }
 }
 
@@ -85,10 +103,13 @@ const origoY2 = origoY1 + 1*circleUnit;
 const origoY3 = origoY1 + 2*circleUnit;
 
 function threeArcsDraw() {
-     
-    drawArc ( origoX, origoY1, circleRadius, nullAngle, hoursEndAngle );
-    drawArc ( origoX, origoY2, circleRadius, nullAngle,  minsEndAngle );
-    drawArc ( origoX, origoY3, circleRadius, nullAngle,  secsEndAngle );
+
+    for ( let tu=0; tu<3; tu++ ) {
+
+        if (tu==0) { drawArc ( tu, origoX, origoY1, circleRadius, nullAngle, hoursEndAngle ); }
+        if (tu==1) { drawArc ( tu, origoX, origoY2, circleRadius, nullAngle,  minsEndAngle ); }
+        if (tu==2) { drawArc ( tu, origoX, origoY3, circleRadius, nullAngle,  secsEndAngle ); }
+    }
 }
 
 
@@ -135,9 +156,9 @@ function textColor1_1() {
 
     ctx.textBaseline = "bottom";
      
-    ctx.fillText(" A teljes mai napból eddig eltelt egész", textX, textY11);
-    ctx.fillText(" Az aktuális órából eddig eltelt egész" , textX, textY21);
-    ctx.fillText(" Az aktuális percből eddig eltelt egész", textX, textY31);
+    ctx.fillText(" A teljes mai napból (24 h) eddig eltelt egész", textX, textY11);
+    ctx.fillText(" Az aktuális órából (60 m) eddig eltelt egész" , textX, textY21);
+    ctx.fillText(" Az aktuális percből (60 s) eddig eltelt egész", textX, textY31);
 }
 
 function textColor1_2() {
@@ -218,5 +239,5 @@ function drawAll() {
 }
 
 
-/* drawAll();  // A fó-függvény azonnali (1.) meghívása. */
-setInterval(drawAll, 1000);  // A fó-fv. másodpercenkénti (1000 msec) meghívása.
+drawAll();  // A fő-függvény azonnali (1.) meghívása. */
+setInterval(drawAll, 1000);  // A fő-fv. másodpercenkénti (1000 msec) meghívása.

@@ -50,22 +50,41 @@ for ( let i=0; i < colorArr.length; ++i ) {  colorArr[i] = new Array(3);
     colorArr[i][1] = `rgba( 0, 255, 0, ${a} )`;
     colorArr[i][2] = `rgba( 0, 0, 255, ${a} )`;  
 }
-// Az eltelt (0.:color1) és a hátralévő (1.:color2) időegység (0:h, 1:m, 2:s) színe.
+   // Az eltelt (0.:color1) és a hátralévő (1.:color2) időegység (0:h, 1:m, 2:s) színe.
 
 function drawArc( j, ox, oy, radius, startAngle, endAngle ) {
              
-    ctx.lineWidth = 50;  // Vonalvastagság, vagyis az időkerék karimájának a szélessége.
-
     if ( startAngle == endAngle ) { startAngle -= 0.000001; }
     // Kis trükk, hogy 0-s startszög esetén a teljes körív kirajzolódjon hátralévőként (color2)!
     
+    ctx.font = "20px Arial";
+    ctx.textBaseline = "middle";
+
     for ( let i=0; i<2; i++ ) {
 
+        let timeUnitChar="";  // tu: TimeUnit (0:h, 1:m, 2:s)
+        switch(j) {      
+            case 0: timeUnitChar="H";  break;
+            case 1: timeUnitChar="M";  break;
+            case 2: timeUnitChar="S";  break;
+        }
+        ctx.fillStyle = colorArr[0][j];  
+        ctx.fillText( `${timeUnitChar}`, ox-(16/2), oy );
+
+        ctx.lineWidth = 50;  // Az időkerék karimájának szélessége, azaz a vonalvastagsága.
         ctx.beginPath();
         ctx.arc( ox, oy, radius, startAngle, endAngle, i%2 );
-             
         ctx.strokeStyle = colorArr[i][j];  // false (0): colorArr[0][] , true (1): colorArr[1][]
         ctx.stroke();
+      
+        ctx.lineWidth = 2;  // Az időkerekek szélén lévő 12db (20 fokonkénti) jelölés vonalvastagsága.
+        for ( let tum=0; tum<12; tum++ ) {
+                                            // tum: Time Unit Mark
+            ctx.beginPath();
+            ctx.arc( ox, oy, radius+50/2 +2, tum*fullCircle/12 -0.01, tum*fullCircle/12 +0.01 );  
+            ctx.strokeStyle = "gray";  // Az időkerekek szélén lévő 12db (20 fokonkénti) jelölés színe.
+            ctx.stroke();
+        }
     }
 }
 
@@ -115,8 +134,10 @@ let fillRectColor;
 function textsColorPrint() {  // Az eltelt és a hátralévő időegységek szövegének kiiratása a megfelelő színekben.
 
     textsColorArr = [ 
-        ["napból","órából","percből" , " órák (h) száma: "," percek (m) száma: "," másodpercek (s) száma: "] ,
-        ["E napból","Az órából","A percből" , " órák (h) száma: "," percek (m) száma: "," másodpercek (s) száma: "] ];    
+        ["napból (24 h)","órából (60 m)","percből (60 s)" , 
+         " órák (h) száma: "," percek (m) száma: "," másodpercek (s) száma: "] ,
+        ["E napból","Az órából","A percből" , 
+         " órák (h) száma: "," percek (m) száma: "," másodpercek (s) száma: "] ];    
 
     for ( i=0; i<2; i++ ) {
         for ( j=0; j<3; j++ ) {
@@ -166,5 +187,5 @@ function drawAll() {  // A FŐ-FÜGGVÉNY!
 }
 
 
-/* drawAll();  // A fő-függvény azonnali (1.) meghívása. */
+drawAll();  // A fő-függvény azonnali (1.) meghívása. */
 setInterval( drawAll, 1000 );  // A fő-fv. másodpercenkénti (1000 msec) meghívása.
